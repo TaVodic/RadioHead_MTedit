@@ -674,7 +674,8 @@ bool RH_ASK::send(const uint8_t* data, uint8_t len)
     uint16_t index = 0;
     uint16_t crc = 0xffff;
     uint8_t *p = _txBuf + RH_ASK_PREAMBLE_LEN; // start of the message area
-    uint8_t count = len + 3/* + RH_ASK_HEADER_LEN*/; // Added byte count and FCS and headers to get total number of bytes
+    // MT: removed
+    uint8_t count = len + 3/* + RH_ASK_HEADER_LEN*/; // Added byte count and FCS and headers to get total number of bytes 
 
     if (len > RH_ASK_MAX_MESSAGE_LEN)
 	return false;
@@ -690,6 +691,7 @@ bool RH_ASK::send(const uint8_t* data, uint8_t len)
     p[index++] = symbols[count >> 4];
     p[index++] = symbols[count & 0xf];
 
+    // MT: removed
     // Encode the headers
     /*crc = RHcrc_ccitt_update(crc, _txHeaderTo);
     p[index++] = symbols[_txHeaderTo >> 4];
