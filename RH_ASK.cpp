@@ -650,11 +650,18 @@ bool RH_INTERRUPT_ATTR RH_ASK::recv(uint8_t* buf, uint8_t* len)
     {
 	// Skip the length and 4 headers that are at the beginning of the rxBuf
 	// and drop the trailing 2 bytes of FCS
-	uint8_t message_len = _rxBufLen-RH_ASK_HEADER_LEN - 3;
+	/*uint8_t message_len = _rxBufLen-RH_ASK_HEADER_LEN - 3;
 	if (*len > message_len)
 	    *len = message_len;
 	memcpy(buf, _rxBuf+RH_ASK_HEADER_LEN+1, *len);
+    }*/
+
+    uint8_t message_len = _rxBufLen - 3;
+	if (*len > message_len)
+	    *len = message_len;
+	memcpy(buf, _rxBuf+1, *len);
     }
+
     _rxBufValid = false; // Got the most recent message, delete it
 //    printBuffer("recv:", buf, *len);
     return true;
@@ -684,7 +691,7 @@ bool RH_ASK::send(const uint8_t* data, uint8_t len)
     p[index++] = symbols[count & 0xf];
 
     // Encode the headers
-    crc = RHcrc_ccitt_update(crc, _txHeaderTo);
+    /*crc = RHcrc_ccitt_update(crc, _txHeaderTo);
     p[index++] = symbols[_txHeaderTo >> 4];
     p[index++] = symbols[_txHeaderTo & 0xf];
     crc = RHcrc_ccitt_update(crc, _txHeaderFrom);
@@ -695,7 +702,7 @@ bool RH_ASK::send(const uint8_t* data, uint8_t len)
     p[index++] = symbols[_txHeaderId & 0xf];
     crc = RHcrc_ccitt_update(crc, _txHeaderFlags);
     p[index++] = symbols[_txHeaderFlags >> 4];
-    p[index++] = symbols[_txHeaderFlags & 0xf];
+    p[index++] = symbols[_txHeaderFlags & 0xf];*/
 
     // Encode the message into 6 bit symbols. Each byte is converted into 
     // 2 6-bit symbols, high nybble first, low nybble second
