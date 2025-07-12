@@ -955,32 +955,32 @@ uint8_t RH_INTERRUPT_ATTR RH_ASK::symbol_6to4(uint8_t symbol)
 // Check whether the latest received message is complete and uncorrupted
 // We should always check the FCS at user level, not interrupt level
 // since it is slow
-void RH_ASK::validateRxBuf()
-{
-    uint16_t crc = 0xffff;
-    // The CRC covers the byte count, headers and user data
-    for (uint8_t i = 0; i < _rxBufLen; i++)
-	crc = RHcrc_ccitt_update(crc, _rxBuf[i]);
-    if (crc != 0xf0b8) // CRC when buffer and expected CRC are CRC'd
-    {
-	// Reject and drop the message
-	_rxBad++;
-	_rxBufValid = false;
-	return;
-    }
+void RH_ASK::validateRxBuf() {
+  uint16_t crc = 0xffff;
+  // The CRC covers the byte count, headers and user data
+  for (uint8_t i = 0; i < _rxBufLen; i++)
+    crc = RHcrc_ccitt_update(crc, _rxBuf[i]);
+  if (crc != 0xf0b8)  // CRC when buffer and expected CRC are CRC'd
+  {
+    // Reject and drop the message
+    _rxBad++;
+    _rxBufValid = false;
+    return;
+  }
 
-    // Extract the 4 headers that follow the message length
-    _rxHeaderTo    = _rxBuf[1];
-    _rxHeaderFrom  = _rxBuf[2];
-    _rxHeaderId    = _rxBuf[3];
-    _rxHeaderFlags = _rxBuf[4];
-    if (_promiscuous ||
-	_rxHeaderTo == _thisAddress ||
-	_rxHeaderTo == RH_BROADCAST_ADDRESS)
-    {
-	_rxGood++;
-	_rxBufValid = true;
-    }
+// MT: removed
+  /*// Extract the 4 headers that follow the message length
+  _rxHeaderTo = _rxBuf[1];
+  _rxHeaderFrom = _rxBuf[2];
+  _rxHeaderId = _rxBuf[3];
+  _rxHeaderFlags = _rxBuf[4];
+  if (_promiscuous ||
+      _rxHeaderTo == _thisAddress ||
+      _rxHeaderTo == RH_BROADCAST_ADDRESS) {
+    _rxGood++;
+    _rxBufValid = true;
+  }*/
+  _rxBufValid = true; // MT: added
 }
 
 void RH_INTERRUPT_ATTR RH_ASK::receiveTimer()
@@ -1041,7 +1041,7 @@ void RH_INTERRUPT_ATTR RH_ASK::receiveTimer()
 		    // Check it for sensibility. It cant be less than 7, since it
 		    // includes the byte count itself, the 4 byte header and the 2 byte FCS
 		    _rxCount = this_byte;
-		    if (_rxCount < 7 || _rxCount > RH_ASK_MAX_PAYLOAD_LEN)
+		    if (_rxCount < 5 || _rxCount > RH_ASK_MAX_PAYLOAD_LEN) //MT: changed from 7 to 5
 		    {
 			// Stupid message length, drop the whole thing
 			_rxActive = false;
